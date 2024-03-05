@@ -1,5 +1,7 @@
+@import "./design-system.scss";
+
 @font-face {
-  font-family: 'Korean';
+  font-family: Korean;
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10-21@1.0/MaruBuri-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
@@ -10,8 +12,70 @@
   src: url('/KleeOne-SemiBold.woff2');
 }
 
+* {
+  font-family: inherit;
+}
+
 body {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   font-family: Korean, Japanese;
   background-image: url('/note-background.jpg');
   background-repeat: repeat;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+}
+
+h1 {
+  font-size: $font-h1;
+}
+
+h2 {
+  font-size: $font-h2;
+}
+
+h3 {
+  font-size: $font-h3;
+}
+
+h4 {
+  font-size: $font-h4;
+}
+
+h5 {
+  font-size: $font-h5;
+}
+
+.font-b1 {
+  font-size: $font-b1;
+}
+
+.font-b2 {
+  font-size: $font-b2;
+}
+
+.font-b3 {
+  font-size: $font-b3;
+}
+
+.font-c1 {
+  font-size: $font-c1;
+}
+
+.font-c2 {
+  font-size: $font-c2;
+}
+
+.font-c3 {
+  font-size: $font-c3;
 }
