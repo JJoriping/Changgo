@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Korean';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10-21@1.0/MaruBuri-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Japanese;
+  src: url('/KleeOne-SemiBold.woff2');
+}
+
+body {
+  font-family: Korean, Japanese;
+  background-image: url('/note-background.jpg');
+  background-repeat: repeat;
+}

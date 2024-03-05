@@ -1,0 +1,16 @@
+{
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always"
+    }
+  },
+  "[scss]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "vscode.css-language-features"
+  }
+}
