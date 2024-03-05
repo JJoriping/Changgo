@@ -1,1 +1,76 @@
-.word-card {}
+@import "@/design-system.scss";
+
+.word-card {
+  >h3 {
+    padding-bottom: 2px;
+    border-bottom: 1px dashed $c-gray-b2;
+
+    >.kanji-expression {
+      font-size: $font-h5;
+    }
+  }
+
+  >div {
+    margin: 4px 0;
+  }
+
+  audio,
+  img {
+    vertical-align: middle;
+  }
+
+  em {
+    font-weight: bold;
+  }
+
+  blockquote {
+    padding-left: 8px;
+    border-left: 4px solid $c-gray-b3;
+    margin: 4px 0;
+    color: $c-gray-d2;
+    font-size: $font-b3;
+  }
+}
+
+.from {
+  padding: 2px 4px;
+  border: 1px solid $c-gray-b3;
+  font-size: $font-c1;
+}
+
+.kanji-expression {
+  &::before {
+    content: "【";
+    margin-left: 4px;
+  }
+
+  &::after {
+    content: "】";
+  }
+
+  color: $c-gray-d1;
+}
+
+.category-0 {
+  padding: 4px;
+  margin-top: 16px;
+  text-align: center;
+  background-color: $c-gray-b4;
+}
+
+.category-1 {
+  display: inline-block;
+  padding: 0 4px;
+  margin-right: 8px;
+  color: $c-white;
+  background-color: $c-gray-d2;
+}
+
+.category-2 {
+  display: inline-block;
+  padding: 0 2px;
+  border: 1px solid $c-gray;
+  margin-left: 8px;
+  margin-right: 8px;
+  font-size: $font-c1;
+}

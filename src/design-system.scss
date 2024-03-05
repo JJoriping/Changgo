@@ -9,3 +9,15 @@ $font-b3: 14px;
 $font-c1: 12px;
 $font-c2: 10px;
 $font-c3: 9px;
+
+$c-step-tick: 10.5%;
+$c-white: #FFFFFF;
+$c-gray: #7F7F7F;
+$c-gray-b1: lighten($c-gray, $c-step-tick);
+$c-gray-b2: lighten($c-gray, 2 * $c-step-tick);
+$c-gray-b3: lighten($c-gray, 3 * $c-step-tick);
+$c-gray-b4: lighten($c-gray, 4 * $c-step-tick);
+$c-gray-d1: darken($c-gray, $c-step-tick);
+$c-gray-d2: darken($c-gray, 2 * $c-step-tick);
+$c-gray-d3: darken($c-gray, 3 * $c-step-tick);
+$c-gray-d4: darken($c-gray, 4 * $c-step-tick);

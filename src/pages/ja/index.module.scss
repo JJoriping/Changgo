@@ -1,0 +1,13 @@
+@import "@/design-system.scss";
+
+.list {
+  padding: 8px;
+
+  >li {
+    padding: 8px;
+
+    &:hover {
+      background-color: rgba($c-white, 50%);
+    }
+  }
+}
