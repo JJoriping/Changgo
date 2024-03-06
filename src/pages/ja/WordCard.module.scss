@@ -21,6 +21,7 @@
 
   em {
     font-weight: bold;
+    color: $c-gray-d4;
   }
 
   blockquote {
@@ -49,6 +50,28 @@
   }
 
   color: $c-gray-d1;
+}
+
+.sentence-component {
+  &[data-type="名詞"] {
+    background-color: $c-gray-b3;
+  }
+
+  &[data-type="動詞"] {
+    background-color: $c-green-b4;
+  }
+
+  &[data-type="形容詞"] {
+    background-color: $c-red-b4;
+  }
+
+  &[data-type="副詞"] {
+    background-color: $c-blue-b4;
+  }
+
+  &:hover {
+    text-decoration: underline wavy rgba($c-black, 30%);
+  }
 }
 
 .category-0 {

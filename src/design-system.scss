@@ -11,8 +11,10 @@ $font-c2: 10px;
 $font-c3: 9px;
 
 $c-step-tick: 10.5%;
-$c-white: #FFFFFF;
-$c-gray: #7F7F7F;
+$c-white: #ffffff;
+$c-black: #000000;
+
+$c-gray: #7f7f7f;
 $c-gray-b1: lighten($c-gray, $c-step-tick);
 $c-gray-b2: lighten($c-gray, 2 * $c-step-tick);
 $c-gray-b3: lighten($c-gray, 3 * $c-step-tick);
@@ -21,3 +23,33 @@ $c-gray-d1: darken($c-gray, $c-step-tick);
 $c-gray-d2: darken($c-gray, 2 * $c-step-tick);
 $c-gray-d3: darken($c-gray, 3 * $c-step-tick);
 $c-gray-d4: darken($c-gray, 4 * $c-step-tick);
+
+$c-red: #d02b2b;
+$c-red-b1: lighten($c-red, $c-step-tick);
+$c-red-b2: lighten($c-red, 2 * $c-step-tick);
+$c-red-b3: lighten($c-red, 3 * $c-step-tick);
+$c-red-b4: lighten($c-red, 4 * $c-step-tick);
+$c-red-d1: darken($c-red, $c-step-tick);
+$c-red-d2: darken($c-red, 2 * $c-step-tick);
+$c-red-d3: darken($c-red, 3 * $c-step-tick);
+$c-red-d4: darken($c-red, 4 * $c-step-tick);
+
+$c-green: #2bb84e;
+$c-green-b1: lighten($c-green, $c-step-tick);
+$c-green-b2: lighten($c-green, 2 * $c-step-tick);
+$c-green-b3: lighten($c-green, 3 * $c-step-tick);
+$c-green-b4: lighten($c-green, 4 * $c-step-tick);
+$c-green-d1: darken($c-green, $c-step-tick);
+$c-green-d2: darken($c-green, 2 * $c-step-tick);
+$c-green-d3: darken($c-green, 3 * $c-step-tick);
+$c-green-d4: darken($c-green, 4 * $c-step-tick);
+
+$c-blue: #2c51c9;
+$c-blue-b1: lighten($c-blue, $c-step-tick);
+$c-blue-b2: lighten($c-blue, 2 * $c-step-tick);
+$c-blue-b3: lighten($c-blue, 3 * $c-step-tick);
+$c-blue-b4: lighten($c-blue, 4 * $c-step-tick);
+$c-blue-d1: darken($c-blue, $c-step-tick);
+$c-blue-d2: darken($c-blue, 2 * $c-step-tick);
+$c-blue-d3: darken($c-blue, 3 * $c-step-tick);
+$c-blue-d4: darken($c-blue, 4 * $c-step-tick);
