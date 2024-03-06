@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from "react";
 
-const nodePattern = /[\uF000-\uF0FF]/g;
+const nodePattern = /[\uF000-\uF7FF]/g;
 
 export default class ComponentFactory<T = {}>{
   private readonly staticProps?:T;

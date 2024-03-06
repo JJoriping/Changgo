@@ -30,6 +30,20 @@
     margin: 4px 0;
     color: $c-gray-d2;
     font-size: $font-b3;
+
+    >small {
+      display: block;
+
+      &::before {
+        content: "─";
+        margin-right: 4px;
+      }
+    }
+
+    >button {
+      display: block;
+      margin-top: 4px;
+    }
   }
 }
 
@@ -71,6 +85,16 @@
 
   &:hover {
     text-decoration: underline wavy rgba($c-black, 30%);
+  }
+}
+
+.sentence-component-popup {
+  position: absolute;
+  box-shadow: 0 0 10px rgba($c-black, 10%);
+  z-index: 1;
+
+  >iframe {
+    border: 0;
   }
 }
 

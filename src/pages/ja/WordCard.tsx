@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from "react";
-import { memo, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import styles from "./WordCard.module.scss";
 import { SakuraParis } from "@/types/external";
 import type { ComponentFactoryProps } from "@/utilities/component-factory";
@@ -8,14 +8,23 @@ import ComponentFactory from "@/utilities/component-factory";
 const tagPattern = /\[[\w/]+?]/g;
 const keywordPattern = /\[keyword].+?\[\/keyword]/g;
 const yomigataPattern = /<ruby>(.+?)<rp>\(<\/rp><rt>(.+?)<\/rt><rp>\)<\/rp><\/ruby>/gi;
-const sentenceComponentPattern = /<span data-word=".+?" data-word-type="(.+?)" data-word-reading=".+?">(.+?)<\/span>/gi;
+const sentenceComponentPattern = /<span data-word="(.+?)" data-word-type="(.+?)" data-word-reading=".+?">(.+?)<\/span>/gi;
 
 type Props = {
   'data': SakuraParis.Word
 };
 const WordCard:FC<Props> = ({ data }) => {
   const [ yomigataEnabled, setYomigataEnabled ] = useState(false);
-  const [ text, setText ] = useState(() => data.text.replace(keywordPattern, ""));
+  const [ text, setText ] = useState(() => {
+    const kanjiHeading = data.heading.match(/【(.+?)】/);
+    const plainHeading = (kanjiHeading ? data.heading.slice(0, kanjiHeading.index) : data.heading).replace(/[^あ-んア-ン・]/g, "");
+    const root = plainHeading.includes("・") ? plainHeading.split('・')[0] : kanjiHeading?.[1].split('・')[0] || plainHeading;
+
+    return data.text
+      .replace(keywordPattern, "")
+      .replace(/―・?(?![\w [])/g, `\u200B${root}`)
+    ;
+  });
   const $heading = useMemo(() => {
     const factory = new ComponentFactory(data.heading, { from: data.from });
     const accessories:ReactNode[] = [];
@@ -40,11 +49,9 @@ const WordCard:FC<Props> = ({ data }) => {
     return factory.build().concat(accessories);
 
     async function handleYomigataClick():Promise<void>{
-      const plainHeading = data.heading.replace(/[^あ-んア-ン・]/g, "");
-      const root = plainHeading.split('・')[0];
       let yomigata = await fetch("/api/yomigata", {
         method: "POST",
-        body: text.replace(/―・?/g, String.fromCharCode(0x200B) + root)
+        body: text
       }).then(res => res.text());
 
       yomigata = yomigata.replace(/<span .+?>([\d０-９]+?)<\/span>/gi, "$1");
@@ -63,17 +70,17 @@ const WordCard:FC<Props> = ({ data }) => {
         factory.put(/（([０-９]+?)）(?!})/g, Category1);
         factory.put(/（([ア-ン])）/g, Category2);
         factory.put(/「([^\u200B―」]*?[\u200B―][^\u200B―」]*?)」/g, Example);
-        factory.put(/\[reference]([⇒⇔])(.+?)\[\/reference.*?]/g, Reference);
+        factory.put(/\[reference]([→⇒⇔])(.+?)\[\/reference.*?]/g, Reference);
         break;
       case "사이토":
         factory.put(/\[decoration](\d+)\[\/decoration]\./g, Category1);
         factory.put(/\[decoration](.+?)\[\/decoration]/g, Decoration);
-        factory.put(/^◆(.+?)　(.+)$/gm, Example);
+        factory.put(/^[◆◇](.+?)　(.+)$/gm, Example);
         break;
       case "NHK발음":
         factory.put(/\[wav page=(\d+?),offset=(\d+?),endpage=(\d+?),endoffset=(\d+?)].+?\[\/wav]/g, Voice);
         factory.put(/\[image format=(\w+?),inline=1,page=(\d+?),offset=(\d+?)]\[\/image]/g, VoiceImage);
-        factory.replace(/^[\S\s]+?(?=[\uF000-\uF0FF])/, "");
+        factory.replace(/^[\S\s]+?(?=[\uF000-\uF7FF])/, "");
         break;
     }
     return factory.build();
@@ -103,7 +110,66 @@ const Decoration:FC<WordCardCFProps> = ({ groups, recur }) => <em>{recur(groups[
 const Category0:FC<WordCardCFProps> = ({ groups }) => <div className={styles['category-0']}>{groups[0]} {groups[1]}</div>;
 const Category1:FC<WordCardCFProps> = ({ groups }) => <><div /><label className={styles['category-1']}>{groups[0]}</label></>;
 const Category2:FC<WordCardCFProps> = ({ groups }) => <><div /><label className={styles['category-2']}>{groups[0]}</label></>;
-const Example:FC<WordCardCFProps> = ({ groups, recur }) => <blockquote>{recur(groups[0])}{Boolean(groups[1]) && <><br />{recur(groups[1])}</>}</blockquote>;
+const Example:FC<WordCardCFProps> = ({ groups, recur }) => {
+  const $ = useRef<HTMLQuoteElement>(null);
+  const [ translation, setTranslation ] = useState<string>();
+
+  const handleTranslate = useCallback(async () => {
+    if(!$.current) return;
+    const $clone = $.current.cloneNode(true) as HTMLQuoteElement;
+    for(const $v of Array.from($clone.querySelectorAll("rt, button, small"))){
+      $v.remove();
+    }
+
+    const result = await fetch("/api/translate", {
+      method: "POST",
+      body: $clone.textContent
+    }).then(res => res.text());
+
+    setTranslation(result || "(번역 실패)");
+  }, []);
+
+  const [ text, quotation ] = groups[0].split('/');
+
+  return <blockquote ref={$}>
+    {recur(text)}
+    {typeof groups[1] === "string" && <><br />{recur(groups[1])}</>}
+    {Boolean(quotation) && <small>{recur(quotation)}</small>}
+    {translation
+      ? <p>{translation}</p>
+      : <button onClick={handleTranslate}>번역</button>
+    }
+  </blockquote>;
+};
 const Ruby:FC<WordCardCFProps> = ({ groups }) => <ruby>{groups[0]}<rt>{groups[1]}</rt></ruby>;
-const SentenceComponent:FC<WordCardCFProps> = ({ groups, recur }) => <span className={styles['sentence-component']} data-type={groups[0]}>{recur(groups[1])}</span>;
+const SentenceComponent:FC<WordCardCFProps> = ({ groups, recur }) => {
+  const popupWidth = 360;
+  const popupHeight = 600;
+
+  const $ = useRef<HTMLSpanElement>(null);
+  const [ popupURL, setPopupURL ] = useState<string>();
+
+  const handleClick = useCallback(() => {
+    setPopupURL(`https://small.dic.daum.net/search.do?q=${encodeURIComponent(groups[0])}&dic=jp`);
+  }, [ groups ]);
+
+  const rect = $.current?.getBoundingClientRect();
+
+  return <>
+    <span ref={$} className={styles['sentence-component']}
+      data-type={groups[1]}
+      onClick={handleClick}
+      onBlur={() => setPopupURL(undefined)}
+      tabIndex={-1}
+    >
+      {recur(groups[2])}
+    </span>
+    {Boolean(popupURL) && rect && <div className={styles['sentence-component-popup']} style={{
+      top: Math.min(rect.top + rect.height, window.innerHeight - popupHeight),
+      left: Math.min(rect.left, window.innerWidth - popupWidth)
+    }}>
+      <iframe src={popupURL} width={popupWidth} height={popupHeight} />
+    </div>}
+  </>;
+};
 const Reference:FC<WordCardCFProps> = ({ groups, recur }) => <>{groups[0]}<a href={`/ja?q=${encodeURIComponent(groups[1])}`}>{recur(groups[1])}</a></>;
