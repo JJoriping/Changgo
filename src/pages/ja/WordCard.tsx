@@ -1,5 +1,5 @@
-import type { FC, ReactNode } from "react";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import type { FC, ReactNode, MouseEventHandler } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./WordCard.module.scss";
 import { SakuraParis } from "@/types/external";
 import type { ComponentFactoryProps } from "@/utilities/component-factory";
@@ -25,8 +25,9 @@ const WordCard:FC<Props> = ({ data }) => {
       .replace(/―・?(?![\w [])/g, `\u200B${root}`)
     ;
   });
+  const [ voice, setVoice ] = useState<SpeechSynthesisVoice>();
   const $heading = useMemo(() => {
-    const factory = new ComponentFactory(data.heading, { from: data.from });
+    const factory = new ComponentFactory(data.heading, { from: data.from, voice });
     const accessories:ReactNode[] = [];
 
     switch(data.from){
@@ -58,9 +59,9 @@ const WordCard:FC<Props> = ({ data }) => {
       setText(yomigata);
       setYomigataEnabled(true);
     }
-  }, [ data.from, data.heading, text, yomigataEnabled ]);
+  }, [ data.from, data.heading, text, voice, yomigataEnabled ]);
   const $text = useMemo(() => {
-    const factory = new ComponentFactory(text, { from: data.from });
+    const factory = new ComponentFactory(text, { from: data.from, voice });
 
     factory.put(yomigataPattern, Ruby).put(sentenceComponentPattern, SentenceComponent);
     switch(data.from){
@@ -84,7 +85,17 @@ const WordCard:FC<Props> = ({ data }) => {
         break;
     }
     return factory.build();
-  }, [ data.from, text ]);
+  }, [ data.from, text, voice ]);
+
+  useEffect(() => {
+    const onVoicesChanged = () => {
+      setVoice(speechSynthesis.getVoices().findLast(v => v.lang.startsWith("ja")) || undefined);
+    };
+    speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
+    return () => {
+      speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+    };
+  }, []);
 
   return <div className={styles['word-card']}>
     <span className={styles['from']}>{data.from}</span>
@@ -94,7 +105,7 @@ const WordCard:FC<Props> = ({ data }) => {
 };
 export default memo(WordCard);
 
-type WordCardCFProps = ComponentFactoryProps<{ from: SakuraParis.DictionaryName }>;
+type WordCardCFProps = ComponentFactoryProps<{ 'from': SakuraParis.DictionaryName, 'voice': SpeechSynthesisVoice|undefined }>;
 const Voice:FC<WordCardCFProps> = ({ from, groups }) => {
   const url = useMemo(() => `/api/nhk-voice?name=${SakuraParis.getDictionaryName(from)}&file=${groups[0]}_${groups[1]}_${groups[2]}_${groups[3]}.wav`, [ from, groups ]);
 
@@ -110,24 +121,33 @@ const Decoration:FC<WordCardCFProps> = ({ groups, recur }) => <em>{recur(groups[
 const Category0:FC<WordCardCFProps> = ({ groups }) => <div className={styles['category-0']}>{groups[0]} {groups[1]}</div>;
 const Category1:FC<WordCardCFProps> = ({ groups }) => <><div /><label className={styles['category-1']}>{groups[0]}</label></>;
 const Category2:FC<WordCardCFProps> = ({ groups }) => <><div /><label className={styles['category-2']}>{groups[0]}</label></>;
-const Example:FC<WordCardCFProps> = ({ groups, recur }) => {
+const Example:FC<WordCardCFProps> = ({ groups, voice, recur }) => {
   const $ = useRef<HTMLQuoteElement>(null);
   const [ translation, setTranslation ] = useState<string>();
 
-  const handleTranslate = useCallback(async () => {
+  const getPlainText = useCallback(() => {
     if(!$.current) return;
     const $clone = $.current.cloneNode(true) as HTMLQuoteElement;
     for(const $v of Array.from($clone.querySelectorAll("rt, button, small"))){
       $v.remove();
     }
-
+    return $clone.textContent || undefined;
+  }, []);
+  const handleTranslate = useCallback<MouseEventHandler<HTMLButtonElement>>(async e => {
+    e.currentTarget.disabled = true;
     const result = await fetch("/api/translate", {
       method: "POST",
-      body: $clone.textContent
+      body: getPlainText()
     }).then(res => res.text());
 
     setTranslation(result || "(번역 실패)");
-  }, []);
+  }, [ getPlainText ]);
+  const handleTTS = useCallback(() => {
+    const utterance = new SpeechSynthesisUtterance(getPlainText());
+
+    if(voice) utterance.voice = voice;
+    speechSynthesis.speak(utterance);
+  }, [ getPlainText, voice ]);
 
   const [ text, quotation ] = groups[0].split('/');
 
@@ -139,6 +159,7 @@ const Example:FC<WordCardCFProps> = ({ groups, recur }) => {
       ? <p>{translation}</p>
       : <button onClick={handleTranslate}>번역</button>
     }
+    <button onClick={handleTTS}>듣기</button>
   </blockquote>;
 };
 const Ruby:FC<WordCardCFProps> = ({ groups }) => <ruby>{groups[0]}<rt>{groups[1]}</rt></ruby>;
