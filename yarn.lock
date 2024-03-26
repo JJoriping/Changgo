@@ -1017,6 +1017,7 @@ __metadata:
     eslint: "npm:^8"
     eslint-config-next: "npm:13.5.6"
     google-translate-api-browser: "npm:4.1.4"
+    midi-file: "npm:^1.2.4"
     next: "npm:13.5.6"
     next-connect: "npm:^1.0.0"
     react: "npm:^18"
@@ -2829,6 +2830,13 @@ __metadata:
     braces: "npm:^3.0.2"
     picomatch: "npm:^2.3.1"
   checksum: 10c0/3d6505b20f9fa804af5d8c596cb1c5e475b9b0cd05f652c5b56141cf941bd72adaeb7a436fda344235cef93a7f29b7472efc779fcdb83b478eab0867b95cdeff
+  languageName: node
+  linkType: hard
+
+"midi-file@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "midi-file@npm:1.2.4"
+  checksum: 10c0/7095ae3244ff4d96b9d9adc07de5d71703b71b670872cfa8ec43be4aa14368313fdbd2f3c98dc0b6c4417dbcd61e3b15d6375ec038a5ada9be4d38c3942e7ca4
   languageName: node
   linkType: hard
 
