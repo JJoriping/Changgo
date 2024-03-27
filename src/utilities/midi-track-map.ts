@@ -1,18 +1,25 @@
-import type { MidiData } from "midi-file";
+import type { MidiData, MidiEvent } from "midi-file";
 
-type MapTrack = {
+export type MapTrack = {
   'channel': number,
   'notes': MapNote[][],
-  'events': MapRawEvent[][]
+  'events': MapRawEvent[][],
+  'sorrygle': SorrygleState,
+  'sorrygleSkipSnapshot'?: SorrygleState
+};
+type SorrygleState = {
+  'bpm': number,
+  'velocity': number,
+  'program': number
 };
 type MapRawEvent = {
   'value': string
 };
-type MapNote = {
+export type MapNote = {
   'octave': number,
   'value': string,
   'duration': number,
-  'staccato'?: boolean
+  'velocity': number
 };
 
 const noteTable = [ "c", "C", "d", "D", "e", "f", "F", "g", "G", "a", "A", "b" ];
@@ -33,51 +40,68 @@ export default class MIDITrackMap{
     for(const v of data.tracks){
       // NOTE 한 트랙은 한 채널만을 갖는다고 상정한다.
       const track:MapTrack = {
-        channel: -1,
+        channel: NaN,
         notes: [],
-        events: []
+        events: [],
+        sorrygle: {
+          bpm: NaN,
+          velocity: 100,
+          program: 0
+        }
       };
-      const activeNotes:Record<number, number> = {};
+      const activeNotes:Record<number, [cursor:number, velocity:number]> = {};
       let cursor = 0;
 
-      for(const w of v){
+      for(let j = 0; j < v.length; j++){
+        const w = v[j];
         cursor += w.deltaTime;
         const position = quantize(cursor);
-        if(position < this.cursorRange[0] || position > this.cursorRange[1]) continue;
+        if(position > this.cursorRange[1]) break;
+        const outOfRange = position < this.cursorRange[0];
 
+        if(!outOfRange){
+          track.sorrygleSkipSnapshot ||= structuredClone(track.sorrygle);
+        }
         switch(w.type){
           case "noteOn":
+            if(outOfRange) continue;
             track.channel = w.channel;
-            activeNotes[w.noteNumber] = cursor;
+            activeNotes[w.noteNumber] = [ cursor, Math.round(w.velocity / 127 * 100) ];
             break;
           case "noteOff": {
-            const startPosition = quantize(activeNotes[w.noteNumber]);
-            const duration = quantize(cursor - activeNotes[w.noteNumber]);
+            if(outOfRange) continue;
+            if(!activeNotes[w.noteNumber]) continue;
+            const startPosition = quantize(activeNotes[w.noteNumber][0]);
+            const duration = quantize(cursor - activeNotes[w.noteNumber][0]);
 
             track.notes[startPosition] ??= [];
             track.notes[startPosition].push({
               octave: Math.floor(w.noteNumber / 12) - 1,
               value: noteTable[w.noteNumber % 12],
-              duration
+              duration,
+              velocity: activeNotes[w.noteNumber][1]
             });
             for(let k = 1; k < duration; k++){
               track.notes[startPosition + k] ??= [];
             }
           } break;
           case "setTempo": {
+            const next = Math.round(60000000 / w.microsecondsPerBeat);
+            if(track.sorrygle.bpm === next) break;
+            if(isNaN(track.channel)) track.channel = -1;
+            track.sorrygle.bpm = next;
             track.events[position] ??= [];
-            track.events[position].push({
-              value: `((bpm=${Math.round(60000000 / w.microsecondsPerBeat)}))`
-            });
+            track.events[position].push({ value: `((bpm=${next}))` });
           } break;
           case "programChange": {
+            if(track.sorrygle.program === w.programNumber) break;
+            track.sorrygle.program = w.programNumber;
             track.events[position] ??= [];
-            track.events[position].push({
-              value: `(p=${w.programNumber})`
-            });
+            track.events[position].push({ value: `(p=${w.programNumber})` });
           } break;
         }
       }
+      track.sorrygleSkipSnapshot ||= structuredClone(track.sorrygle);
       track.events = track.events.slice(this.cursorRange[0]);
       track.notes = track.notes.slice(this.cursorRange[0]);
       R.push(track);
