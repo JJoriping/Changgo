@@ -1,0 +1,43 @@
+@import "@/design-system.scss";
+
+.form {
+  position: sticky;
+  top: 0;
+  display: flex;
+  padding: 4px;
+  background-color: $c-white;
+
+  >button {
+    margin-left: auto;
+  }
+}
+
+.output {
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: 4px;
+
+  >pre {
+    padding: 4px;
+    margin: 4px 0 0 0;
+    word-break: break-all;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: $font-b3;
+    color: $c-gray-b3;
+    cursor: pointer;
+    overflow: auto;
+    background-color: $c-gray-d4;
+
+    >span {
+      transition: all ease 500ms;
+    }
+  }
+
+  .active {
+    color: $c-gray-d4;
+    background-color: $c-gray-b3;
+    transition: none;
+  }
+}
