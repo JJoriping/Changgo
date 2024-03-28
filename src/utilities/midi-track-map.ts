@@ -1,4 +1,4 @@
-import type { MidiData, MidiEvent } from "midi-file";
+import type { MidiData } from "midi-file";
 
 export type MapTrack = {
   'channel': number,

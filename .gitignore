@@ -17,3 +17,6 @@ next-env.d.ts
 
 # yarn
 .yarn/*
+
+# app
+res/m2s-midi/*.mid

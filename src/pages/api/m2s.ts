@@ -1,3 +1,5 @@
+import { writeFile } from "fs/promises";
+import { resolve } from "path";
 import { parseMidi } from "midi-file";
 import type { NextApiRequest, NextApiResponse, PageConfig } from "next";
 import { createRouter } from "next-connect";
@@ -95,6 +97,7 @@ router.post((req, res, next) => {
     }
     R.push(r);
   }
+  await writeFile(resolve("res/m2s-midi", `${Date.now()}.mid`), req.body);
   res.send(R.join('\n'));
 });
 export default router.handler();
@@ -117,6 +120,9 @@ function considerDuration(source:string, duration:number):string{
   const integer = Math.floor(duration);
   const suffix = integer ? "~".repeat(integer - 1) : "";
 
+  if(integer > 5 && integer % 2 === 0){
+    return `(|${source}${"~".repeat((integer >> 1) - 1)})`;
+  }
   return source + suffix;
 }
 function parallelizeNotes(track:MapTrack, octave:number, index:number){
