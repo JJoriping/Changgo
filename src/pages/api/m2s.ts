@@ -89,18 +89,9 @@ router.post((req, res, next) => {
         velocity = notes[0].velocity;
         r += `(v=${velocity})`;
       }
-      if(notes.length > 1 && notes.every(x => x.duration === notes[0].duration)){
-        let chunk = "[";
-        for(const x of notes){
-          chunk += getOctavePrefix(octave, x.octave) + x.value;
-        }
-        chunk += "]";
-        r += considerDuration(chunk, notes[0].duration);
-      }else{
-        const { result, nextIndex } = parallelizeNotes(v, octave, j);
-        r += result;
-        j = nextIndex;
-      }
+      const { result, nextIndex } = parallelizeNotes(v, octave, j);
+      r += result;
+      j = nextIndex;
     }
     R.push(r);
   }
@@ -145,18 +136,33 @@ function parallelizeNotes(track:MapTrack, octave:number, index:number){
     }
   }
   if(slots.length > 1){
-    const maxLength = Math.max(...slots.map(v => v.length));
-    for(const v of slots){
-      v[maxLength - 1] ??= null!;
+    if(slots.every(v => typeof v[0] === "object" && v.filter(w => typeof w === "object").length === 1)){
+      let duration = 0;
+      let chunk = "[";
+      for(const v of slots){
+        const note = v.find(w => typeof w === "object");
+        if(typeof note !== "object") continue;
+        chunk += getOctavePrefix(octave, note.octave) + note.value;
+        duration = note.duration;
+      }
+      chunk += "]";
+      result += considerDuration(chunk, duration);
+    }else{
+      for(const v of slots){
+        for(let j = 0; j < v.length; j++){
+          // <empty item>은 map으로 나오지 않는다.
+          v[j] ??= null!;
+        }
+      }
+      result += "[[";
+      result += slots.map(v => v.map(w => w === true
+        ? ""
+        : w
+        ? considerDuration(getOctavePrefix(octave, w.octave) + w.value, w.duration)
+        : "_"
+      ).join('')).join('|');
+      result += "]]";
     }
-    result += "[[";
-    result += slots.map(v => v.map(w => w === true
-      ? ""
-      : w
-      ? considerDuration(getOctavePrefix(octave, w.octave) + w.value, w.duration)
-      : "_"
-    ).join('')).join('|');
-    result += "]]";
   }else if(slots.length === 1){
     const note = slots[0][0] as MapNote;
     result += considerDuration(getOctavePrefix(octave, note.octave) + note.value, note.duration);
