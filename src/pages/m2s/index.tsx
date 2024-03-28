@@ -20,7 +20,10 @@ const M2S:NextPage = () => {
     const formData = new FormData(e.currentTarget);
 
     setLoading(true);
-    const nextValue = await fetch(`/api/m2s?q=${formData.get("q")}`, {
+    const nextValue = await fetch(`/api/m2s?q=${formData.get("q")}`
+      + (formData.get("skip") ? `&skip=${formData.get("skip")}` : "")
+      + (formData.get("take") ? `&take=${formData.get("take")}` : "")
+    , {
       method: "POST",
       body: formData.get("file")
     }).then(res => res.text());
