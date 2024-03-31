@@ -13,13 +13,13 @@ const JapaneseMeaningRenderer:FC<Props> = ({ data, makingLink }) => {
       subcommon: [] as string[],
       uncommon: [] as string[]
     };
-    const commonChunk = data.match(/^([^〈（]+?)(?:、[〈（]|$)/);
+    const commonChunk = data.match(/^([^〈（]+?)(?:[,、][〈（]|$)/);
     const subcommonChunk = data.match(/（(.+)）/);
     const uncommonChunk = data.match(/〈(.+)〉/);
 
-    if(commonChunk) R.common = commonChunk[1].replaceAll("ー", "").split('、');
-    if(subcommonChunk) R.subcommon = subcommonChunk[1].replaceAll("ー", "").split('、');
-    if(uncommonChunk) R.uncommon = uncommonChunk[1].replaceAll("ー", "").split('、');
+    if(commonChunk) R.common = commonChunk[1].replaceAll("ー", "").split(/[,、]/);
+    if(subcommonChunk) R.subcommon = subcommonChunk[1].replaceAll("ー", "").split(/[,、]/);
+    if(uncommonChunk) R.uncommon = uncommonChunk[1].replaceAll("ー", "").split(/[,、]/);
 
     return R;
   }, [ data ]);

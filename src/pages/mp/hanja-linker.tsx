@@ -14,7 +14,9 @@ const HanjaLinker:FC<Props> = ({ children }) => {
     while(chunk = hanjaPattern.exec(children)){
       R.push(
         children.slice(prevIndex, chunk.index),
-        <a key={R.length} href={`https://hanja.dict.naver.com/#/search?query=${encodeURIComponent(chunk[0])}&range=all`}>{chunk[0]}</a>
+        chunk[0].length === 1
+          ? <a key={R.length} href={`?q=${encodeURIComponent(chunk[0])}`}>{chunk[0]}</a>
+          : <a key={R.length} href={`https://hanja.dict.naver.com/#/search?query=${encodeURIComponent(chunk[0])}&range=all`}>{chunk[0]}</a>
       );
       prevIndex = chunk.index + chunk[0].length;
     }

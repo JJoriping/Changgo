@@ -25,7 +25,9 @@ declare module "@/utilities/mp-data.json"{
     'total_stroke_count': number,
     'words': VocabularyTree,
     'zh_letter': string,
-    'zh_sound': string
+    'zh_sound': string,
+
+    'gosa': Record<string, string>
   };
   const data:Record<string, Entity>;
   export default data;

@@ -1,4 +1,32 @@
+@import "@/design-system.scss";
+
 .main {
-  margin: 0 auto;
-  max-width: 1200px;
+  >form {
+    position: sticky;
+    top: 0;
+    padding: 4px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px $c-green-d3;
+    background-color: $c-green-b4;
+    z-index: 1;
+
+    >div {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+
+      >ol {
+        display: flex;
+        gap: 2px;
+        overflow: auto;
+      }
+    }
+  }
+
+  >ul {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
