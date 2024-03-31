@@ -1,0 +1,68 @@
+@import "@/design-system.scss";
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 4px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    .letter {
+      width: 80px;
+      font-size: 60px;
+    }
+
+    .related-letters {
+      width: 30%;
+    }
+
+    .korean {
+      width: 20%;
+      text-align: center;
+    }
+
+    .stroke {
+      width: 20%;
+      text-align: center;
+    }
+
+    .other-language-letter {
+      text-align: center;
+    }
+
+    .other-language-sound {
+      text-align: center;
+    }
+
+    .other-language-meaning {
+      text-align: center;
+    }
+  }
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  th {
+    width: 36px;
+    text-align: center;
+  }
+
+  td:empty {
+    height: 1em;
+  }
+
+  th,
+  td {
+    padding: 2px 4px;
+    border: 1px solid $c-black;
+  }
+}

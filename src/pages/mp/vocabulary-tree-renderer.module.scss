@@ -1,0 +1,23 @@
+@import "@/design-system.scss";
+
+.list.flattened>li {
+  display: inline-block;
+  margin-right: 8px;
+
+  &.flattened-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.list:not(.flattened) {
+  column-count: 5;
+
+  ul {
+    padding-left: 4px;
+    border-left: 2px solid $c-gray-b3;
+    column-count: 1;
+  }
+}

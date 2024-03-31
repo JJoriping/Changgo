@@ -1,5 +1,5 @@
 declare module "@/utilities/mp-data.json"{
-  export type VocabularyTree = Array<string|Record<string, Entity['words']>>;
+  export type VocabularyTree = Array<string|string[]|Record<string, Entity['words']>>;
   export type Entity = {
     'abbreviation': string,
     'abbreviation_footnote': string,

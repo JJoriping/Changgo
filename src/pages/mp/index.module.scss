@@ -1,15 +1,4 @@
-@import "@/design-system.scss";
-
-.list {
-  padding: 4px;
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th,
-  td {
-    border: 1px solid $c-black;
-  }
+.main {
+  margin: 0 auto;
+  max-width: 1200px;
 }
