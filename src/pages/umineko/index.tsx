@@ -1,23 +1,19 @@
 import type { NextPage } from "next";
-import type { FormEventHandler, MouseEventHandler } from "react";
-import { useCallback, useRef, useState } from "react";
-import styles from "./index.module.scss";
+import { useSearchParams } from "next/navigation";
+import type { MouseEventHandler } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { characterIdTable } from "./const";
+import styles from "./index.module.scss";
 import type { UminekoWord } from "@/utilities/db";
 import C from "@/utilities/c";
 
 const Umineko:NextPage = () => {
+  const search = useSearchParams();
   const $audio = useRef<HTMLAudioElement>();
 
   const [ words, setWords ] = useState<UminekoWord[]>();
   const [ expandedWord, setExpandedWord ] = useState<number>();
 
-  const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(async e => {
-    e.preventDefault();
-    const data = new FormData(e.currentTarget);
-
-    fetch(`/api/umineko-search?q=${data.get("q")}`).then(res => res.json()).then(setWords);
-  }, []);
   const handleQuoteClick = useCallback<MouseEventHandler<HTMLQuoteElement>>(e => {
     const { voice } = e.currentTarget.dataset;
     if(!voice) return;
@@ -26,10 +22,17 @@ const Umineko:NextPage = () => {
     $audio.current.play();
   }, []);
 
+  const keyword = search.get("q") || undefined;
+
+  useEffect(() => {
+    if(!keyword) return;
+    fetch(`/api/umineko-search?q=${keyword}`).then(res => res.json()).then(setWords);
+  }, [ keyword ]);
+
   return <>
     <header className={styles['header']}>
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="q" placeholder="검색어" />
+      <form action="/umineko">
+        <input type="text" name="q" placeholder="검색어" defaultValue={keyword} />
       </form>
     </header>
     <main>
