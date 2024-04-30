@@ -1,0 +1,69 @@
+@import "@/design-system.scss";
+
+.header {
+  position: sticky;
+  top: 0;
+  padding: 4px;
+  background-color: rgba($c-white, 80%);
+}
+
+.word {
+  padding: 8px 16px;
+
+  >.title {
+    font-size: $font-h2;
+
+    >i {
+      margin-left: 4px;
+      color: $c-gray-d2;
+      font-weight: bold;
+      font-style: normal;
+      font-size: $font-b3;
+    }
+
+    >span {
+      padding: 2px 4px;
+      border: 1px solid $c-gray-b2;
+      margin-left: 4px;
+      font-size: $font-b3;
+    }
+  }
+
+  >pre {
+    margin: 4px 0;
+    white-space: pre-wrap;
+  }
+
+  >blockquote {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 8px;
+    padding-left: 8px;
+    border-left: 4px solid $c-gray-b3;
+    margin: 4px 0;
+
+    &.clickable:hover {
+      cursor: pointer;
+      background-color: rgba($c-white, 50%);
+    }
+
+    >:first-child {
+      grid-row: span 2;
+      width: 2.5em;
+      height: 2.5em;
+      border-radius: 50%;
+      box-shadow: 0 1px 2px $c-black;
+      background-color: $c-gray-b4;
+    }
+
+    >img {
+      object-fit: cover;
+      object-position: center;
+    }
+
+    >.text-k {
+      color: $c-gray-d1;
+      font-size: $font-b3;
+    }
+  }
+}
