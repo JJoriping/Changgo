@@ -1,16 +1,17 @@
-import type { Connection, QueryResult } from "mysql2/promise";
-import { createConnection } from "mysql2/promise";
+import type { Connection, Pool, QueryResult } from "mysql2/promise";
+import { createConnection, createPool } from "mysql2/promise";
 
 // eslint-disable-next-line @jjoriping/variable-name
 export async function DB(sql:string, args:any[] = []):Promise<QueryResult>{
-  global.db ??= await createConnection({
+  global.pool ??= createPool({
     host: process.env['DB_HOST'],
     port: parseInt(process.env['DB_PORT']!),
     user: process.env['DB_USER'],
     password: process.env['DB_PASSWORD'],
-    database: process.env['DB_DATABASE']
+    database: process.env['DB_DATABASE'],
+    connectionLimit: 3
   });
-  return global.db.query(sql, args).then(([ res ]) => res);
+  return global.pool.query(sql, args).then(([ res ]) => res);
 }
 export type UminekoWord = {
   'id': number,
@@ -30,5 +31,5 @@ export type UminekoQuote = {
 
 declare global{
   // eslint-disable-next-line no-var
-  var db:Connection;
+  var pool:Pool;
 }
